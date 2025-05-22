@@ -1,16 +1,17 @@
 trigger: none
 
 schedules:
-# "0 8" = 8AM UTC = 12AM PST
-- cron: "0 8 * * *"
-  displayName: Nightly build
-  branches:
-    include: [main]
-  always: true
+  # Runs at 8AM UTC (12AM PST) every day
+  - cron: "0 8 * * *"
+    displayName: Nightly build
+    branches:
+      include:
+        - main
+    always: true
 
 variables:
   WindowsContainerImage: "onebranch.azurecr.io/windows/ltsc2022/vse2022:latest"
-  WindowsHostVersion: '1ESWindows2022'
+  WindowsHostVersion: "1ESWindows2022"
 
 resources:
   repositories:
@@ -24,9 +25,11 @@ extends:
   parameters:
     platform:
       name: "windows_undocked"
+
     featureFlags:
       EnableCDPxPAT: false
-      WindowsHostVersion: 1ESWindows2022
+      WindowsHostVersion: "1ESWindows2022"
+
     globalSdl:
       credscan:
         enabled: true
@@ -35,16 +38,17 @@ extends:
           enabled: true
       tsa:
         enabled: false
+
     git:
       fetchDepth: -1
       fetchTags: true
 
     stages:
-    - template: build-stage.yml@self
-      parameters:
-        isRelease: false
-        isNightly: true
+      - template: build-stage.yml@self
+        parameters:
+          isRelease: false
+          isNightly: true
 
-    - template: test-stage.yml@self
-      parameters:
-        rs_prerelease_only: false
+      - template: test-stage.yml@self
+        parameters:
+          rs_prerelease_only: false
